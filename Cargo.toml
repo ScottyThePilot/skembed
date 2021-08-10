@@ -1,0 +1,17 @@
+[package]
+name = "skembed"
+version = "0.1.0"
+authors = ["ScottyThePilot <scotty.codes@gmail.com>"]
+edition = "2018"
+description = "Embed data within Minecraft skins"
+
+[dependencies]
+blake3 = "1.0"
+clap = "2.33"
+rand = "0.8"
+rand_xoshiro = "0.6"
+
+[dependencies.image]
+version = "0.23"
+default-features = false
+features = ["png"]
