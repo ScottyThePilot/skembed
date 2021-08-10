@@ -3,6 +3,10 @@ use rand::{Rng, SeedableRng};
 use rand_xoshiro::Xoshiro256PlusPlus;
 
 pub fn extract_data(image: &RgbaImage) -> Vec<u8> {
+  if image.dimensions() != (64, 64) {
+    panic!("Input is not 64x64");
+  };
+
   // Extract the length of the data from the marker pixel
   let data_len = {
     let [mx, my] = MARKER_PIXEL;
@@ -29,8 +33,14 @@ pub fn extract_data(image: &RgbaImage) -> Vec<u8> {
 }
 
 pub fn embed_data(image: &mut RgbaImage, mut bytes: Vec<u8>) {
-  assert_eq!(image.dimensions(), (64, 64), "Input is not 64x64");
-  assert!(bytes.len() <= REGIONS_BYTES as usize, "Data is too large to be embedded");
+  if image.dimensions() != (64, 64) {
+    panic!("Input is not 64x64");
+  };
+
+  if bytes.len() > REGIONS_BYTES as usize {
+    panic!("Data is too large to be embedded");
+  };
+
   let data_len = bytes.len() as u16;
 
   // Clear void areas

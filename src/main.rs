@@ -16,6 +16,7 @@ use image::codecs::png::{
 use std::path::Path;
 use std::fs::{self, File};
 use std::io::{self, Write};
+use std::panic;
 
 fn main() {
   let mut app = clap_app!(skembed =>
@@ -41,6 +42,15 @@ fn main() {
   app.write_long_help(&mut long_help).unwrap();
 
   let matches = app.get_matches();
+
+  panic::set_hook(Box::new(|info| {
+    match info.payload().downcast_ref::<&'static str>() {
+      Some(msg) => println!("error: {}\n\nFor more information try --help", msg),
+      None => println!("{}", info)
+    };
+
+    std::process::exit(1);
+  }));
 
   match matches.subcommand() {
     ("extract", Some(matches)) => {
@@ -124,7 +134,7 @@ fn get_data_mode(data: Option<&Path>, clear: bool) -> Option<&Path> {
   } else if clear {
     None
   } else {
-    produce_error("One of 'data' or 'clear' must be provided");
+    panic!("One of 'data' or 'clear' must be provided");
   }
 }
 
@@ -134,11 +144,6 @@ fn get_output_mode(output: Option<&Path>, overwrite: bool) -> Option<&Path> {
   } else if overwrite {
     None
   } else {
-    produce_error("One of 'output' or 'overwrite' must be provided");
+    panic!("One of 'output' or 'overwrite' must be provided");
   }
-}
-
-fn produce_error(msg: &str) -> ! {
-  println!("error: {}\n\nFor more information try --help", msg);
-  std::process::exit(1)
 }
